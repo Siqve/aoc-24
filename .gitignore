@@ -16,3 +16,6 @@ dkms.conf
 
 # Debug symbols
 *.dSYM
+
+# Exe files
+*.exe
