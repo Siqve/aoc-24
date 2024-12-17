@@ -1,7 +1,7 @@
 #include "file_lib.h"
 
 #include <stdlib.h>
-
+#include <string.h>
 
 char *getLineString(FILE *file, const int maxLineLength) {
     char *lineString = malloc(maxLineLength * sizeof(char));
@@ -9,6 +9,7 @@ char *getLineString(FILE *file, const int maxLineLength) {
         free(lineString);
         return NULL;
     }
+    lineString[strcspn(lineString, "\n")] = 0;
     return lineString;
 }
 
