@@ -91,63 +91,16 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    // int arraySize = 0;
-    // int capacity = 10;
-    // char **A = malloc(capacity * sizeof(char *));
-    // char **B = malloc(capacity * sizeof(char *));
     ArrayData arrayData;
     arrayData.arraySize = 0;
     arrayData.capacity = 10;
     arrayData.A = malloc(arrayData.capacity * sizeof(char *));
     arrayData.B = malloc(arrayData.capacity * sizeof(char *));
 
-    if (!iterateFileLines(fptr, 100, processLine, &arrayData)) {
+    if (!iterateFileLines(fptr, MAX_LINE_LENGTH, processLine, &arrayData)) {
         cleanUp(fptr, &arrayData);
         return EXIT_FAILURE;
     }
-
-    //TODO: Make it work with this new iterateFileLines setup, currently outputs sum: 0
-    // but it worked with the commented out approach hmmmm
-    //
-    //
-    // char *lineString;
-    // while ((lineString = getLineString(fptr, MAX_LINE_LENGTH))) {
-    //     if (arraySize == capacity) {
-    //         if (!expandArray(&capacity, &A, &B)) {
-    //             cleanUp(fptr, A, B, arraySize);
-    //             free(lineString);
-    //             return EXIT_FAILURE;
-    //         }
-    //     }
-    //     const char *a = strtok(lineString, " ");
-    //     char *b = strtok(NULL, " ");
-    //     if (!a || !b) {
-    //         cleanUp(fptr, A, B, arraySize);
-    //         free(lineString);
-    //         return EXIT_FAILURE;
-    //     }
-    //     b[strcspn(b, "\n")] = 0; // Remove trailing newline
-    //
-    //     char *aInArray = A[arraySize] = malloc(MAX_KEY_SIZE * sizeof(char));
-    //     if (!aInArray) {
-    //         perror("Failed to allocate memory for A[arraySize]");
-    //         cleanUp(fptr, A, B, arraySize);
-    //         free(lineString);
-    //         return EXIT_FAILURE;
-    //     }
-    //     strcpy(aInArray, a);
-    //
-    //     char *bInArray = B[arraySize] = malloc(MAX_KEY_SIZE * sizeof(char));
-    //     if (!bInArray) {
-    //         perror("Failed to allocate memory for B[arraySize]");
-    //         cleanUp(fptr, A, B, arraySize);
-    //         free(lineString);
-    //         return EXIT_FAILURE;
-    //     }
-    //     strcpy(bInArray, b);
-    //     arraySize++;
-    //     free(lineString);
-    // }
 
     int occurrences[arrayData.arraySize];
     StringMap *map = StringMap_create(10, MAX_KEY_SIZE);
@@ -165,7 +118,6 @@ int main(void) {
             // If no occurrences, then sum is unchanged
             continue;
         }
-        printf("index: %d\n", index);
         const int impact = atoi(a) * occurrences[index];
         sum += impact;
     }
