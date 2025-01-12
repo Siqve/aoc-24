@@ -13,3 +13,10 @@ target_link_libraries(day1 aoc_libs)
 
 add_executable(day1b src/day1/day1b.c)
 target_link_libraries(day1b aoc_libs)
+
+# Day 2 tasks
+add_executable(day2a src/day2/day2a.c)
+target_link_libraries(day2a aoc_libs)
+
+add_executable(day2b src/day2/day2b.c)
+target_link_libraries(day2b aoc_libs)
