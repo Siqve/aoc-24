@@ -5,16 +5,30 @@
 
 #include "../libs/file_lib.h"
 
-bool processLine(char *line, void *arg) {
-    const char *firstNumberChar = strtok(line, " ");
+bool isSafeLine(char *line, int indexToSkip) {
+    char *firstNumberChar = strtok(line, " ");
+    int currentIndex = 0;
+    if (indexToSkip == currentIndex) {
+        firstNumberChar = strtok(NULL, " ");
+        if (!firstNumberChar) {
+            return true;
+        }
+        currentIndex++;
+    }
+
     int firstNumber = atoi(firstNumberChar);
     bool initialized = false;
     bool increasing = false;
 
-    bool hasPreviousUnsafeStep = false;
-    bool progressNumberAnyway = false;
-
     char *currentNumberChar = strtok(NULL, " ");
+    currentIndex++;
+    if (indexToSkip == currentIndex) {
+        currentNumberChar = strtok(NULL, " ");
+        if (!currentNumberChar) {
+            return true;
+        }
+        currentIndex++;
+    }
     int previousNumber = firstNumber;
     while (currentNumberChar) {
         int currentNumber = atoi(currentNumberChar);
@@ -22,57 +36,77 @@ bool processLine(char *line, void *arg) {
             increasing = previousNumber < currentNumber;
             initialized = true;
         }
-
-        if (currentNumber == previousNumber) {
-            if (hasPreviousUnsafeStep) {
-                return true;
-            }
-            hasPreviousUnsafeStep = true;
-        }
-
         if (increasing) {
             // Check if is increase
-            if (currentNumber < previousNumber) {
-                if (hasPreviousUnsafeStep) {
-                    return true;
-                }
-                hasPreviousUnsafeStep = true;
+            if (currentNumber <= previousNumber) {
+                return false;
             }
             // Make sure increase is at most 3
             if (currentNumber > previousNumber + 3) {
-                if (hasPreviousUnsafeStep) {
-                    return true;
-                }
-                hasPreviousUnsafeStep = true;
-                progressNumberAnyway = true;
-
+                return false;
             }
         } else {
             // Check if is decrease
-            if (currentNumber > previousNumber) {
-                if (hasPreviousUnsafeStep) {
-                    return true;
-                }
-                hasPreviousUnsafeStep = true;
+            if (currentNumber >= previousNumber) {
+                return false;
             }
             // Make sure decrease is at most 3
             if (currentNumber < previousNumber - 3) {
-                if (hasPreviousUnsafeStep) {
-                    return true;
-                }
-                hasPreviousUnsafeStep = true;
-                progressNumberAnyway = true;
-
+                return false;
             }
         }
 
         currentNumberChar = strtok(NULL, " ");
-        if (!hasPreviousUnsafeStep || progressNumberAnyway) {
-            // If has previousUnsafeStep is set to true, we skip this level
-            previousNumber = currentNumber;
+        currentIndex++;
+        if (indexToSkip == currentIndex) {
+            currentNumberChar = strtok(NULL, " ");
+            currentIndex++;
+        }
+        previousNumber = currentNumber;
+    }
+    return true;
+}
+
+int countNumbers(const char *line) {
+    size_t lineLength = strlen(line) + 1; // plus one for null terminator
+
+    char *copy = malloc(lineLength * sizeof(char));
+    if (!copy) {
+        return -1;
+    }
+    strcpy(copy, line); // Use strdup in future
+
+    int length = 0;
+    char *splitPointer = strtok(copy, " ");
+    while (splitPointer) {
+        length++;
+        splitPointer = strtok(NULL, " ");
+    }
+
+    free(copy);
+    return length;
+}
+
+bool processLine(char *line, void *arg) {
+    char *copy = strdup(line);
+    if (isSafeLine(copy, -1)) {
+        *((int *) arg) += 1;
+        return true;
+    }
+
+    // Is unsafe at default line, starting to remove one and one index to see if it becomes safe
+    int numbers = countNumbers(line);
+    if (numbers == -1)
+        return false;
+
+    for (int i = 0; i < numbers; i++) {
+        copy = strdup(line);
+        if (isSafeLine(copy, i)) {
+            *((int *) arg) += 1;
+            return true;
         }
     }
-    *((int *) arg) += 1;
+    free(copy);
     return true;
 }
 
@@ -92,3 +126,4 @@ int main() {
     printf("Safe numbers: %d\n", safeCount);
 
 }
+
