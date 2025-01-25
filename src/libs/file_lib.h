@@ -6,6 +6,15 @@
 
 typedef bool (*lineIterator)(char* line, void *arg);
 
+typedef struct {
+    int lineCount;
+    int longestLineLength;
+} FileInfo;
+
+int getFirstFileLength(FILE *file);
+
+FileInfo *getFileInfo(FILE *file, int maxLineLength);
+
 char* getLineString(FILE* file, int maxLineLength);
 
 bool iterateFileLines(FILE* file, int maxLineLength, lineIterator lineIterator, void *arg);
