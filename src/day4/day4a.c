@@ -3,8 +3,10 @@
 #include <string.h>
 #include "../libs/file_lib.h"
 
+enum { MAX_LINE_LENGTH = 200 };
+
 typedef struct {
-    char **lines;
+    char (*lines)[MAX_LINE_LENGTH];
     int indexedLines;
 } LinesIndex;
 
@@ -41,19 +43,8 @@ void populateDirectionArray(Direction directions[8]) {
 
 bool indexLine(char *line, void *arg) {
     LinesIndex *linesIndex = (LinesIndex *) arg;
-    int lineLength = (int) strlen(line);
-    char *lineCopy = calloc(lineLength + 1, sizeof(char));
-    strncpy(lineCopy, line, lineLength);
-    linesIndex->lines[linesIndex->indexedLines] = lineCopy;
+    strcpy(linesIndex->lines[linesIndex->indexedLines], line);
     linesIndex->indexedLines += 1;
-    return true;
-}
-
-bool clearLinesIndex(LinesIndex *linesIndex) {
-    for (int i = 0; i < linesIndex->indexedLines; i++) {
-        free(linesIndex->lines[i]);
-    }
-    free(linesIndex->lines);
     return true;
 }
 
@@ -66,14 +57,16 @@ int main() {
 
     FileInfo fileInfo = {};
     populateFileInfo(&fileInfo, file, 1000);
+    if (fileInfo.longestLineLength > MAX_LINE_LENGTH) {
+        fprintf(stderr, "Longest line length (%i) exceeds MAX_LINE_LENGTH (%i).", fileInfo.longestLineLength, MAX_LINE_LENGTH);
+        return EXIT_FAILURE;
+    }
 
-    char **lines = malloc(fileInfo.lineCount * sizeof(char *));
+    char lines[fileInfo.lineCount][MAX_LINE_LENGTH];
     LinesIndex linesIndex = {.lines = lines, .indexedLines = 0};
 
     int iteratorLineLength = fileInfo.longestLineLength + 2; // Plus two because of newline and null terminator
     if (!iterateFileLines(file, iteratorLineLength, indexLine, &linesIndex)) {
-        clearLinesIndex(&linesIndex);
-        free(lines);
         return EXIT_FAILURE;
     }
 
@@ -81,7 +74,6 @@ int main() {
     populateDirectionArray(directions);
 
     int counter = 0;
-
     for (int rowIndex = 0; rowIndex < linesIndex.indexedLines; rowIndex++) {
         for (int columnIndex = 0; columnIndex < fileInfo.longestLineLength; columnIndex++) {
             char c = lines[rowIndex][columnIndex];
@@ -114,8 +106,6 @@ int main() {
 
         }
     }
-
-    clearLinesIndex(&linesIndex);
 
     printf("The sum is: %i", counter);
 }
