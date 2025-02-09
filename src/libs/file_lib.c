@@ -26,7 +26,7 @@ bool iterateFileLines(FILE *file, const int maxLineLength, const lineIterator li
     return true;
 }
 
-FileInfo *getFileInfo(FILE *file, int maxLineLength) {
+void populateFileInfo(FileInfo *fileInfo, FILE *file, int maxLineLength) {
     int lineCount = 0;
     int currentMaxLength = 0;
     char *lineString;
@@ -40,10 +40,8 @@ FileInfo *getFileInfo(FILE *file, int maxLineLength) {
     }
 
     free(lineString);
-    FileInfo *fileInfo = malloc(sizeof (FileInfo*));
     fileInfo->lineCount = lineCount;
     fileInfo->longestLineLength = currentMaxLength;
     rewind(file);
-    return fileInfo;
 }
 

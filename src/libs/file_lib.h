@@ -13,7 +13,7 @@ typedef struct {
 
 int getFirstFileLength(FILE *file);
 
-FileInfo *getFileInfo(FILE *file, int maxLineLength);
+void populateFileInfo(FileInfo *fileInfo, FILE *file, int maxLineLength);
 
 char* getLineString(FILE* file, int maxLineLength);
 
