@@ -7,6 +7,10 @@ set(CMAKE_C_STANDARD 17)
 
 add_library(aoc_libs src/libs/file_lib.c src/libs/string_map.c)
 
+# Sandbox
+add_executable(sandbox src/sandbox.c)
+target_link_libraries(sandbox aoc_libs)
+
 # Day 1 tasks
 add_executable(day1 src/day1/day1a.c)
 target_link_libraries(day1 aoc_libs)
